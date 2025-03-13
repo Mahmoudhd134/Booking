@@ -58,7 +58,7 @@ Before starting the project, apply the migrations to update the database. Open y
 ```bash
 dotnet ef database update -s Booking.Api -p Booking.DataAccess
 ```
-- you can modify the connection string at appsettings.json file
+- you can modify the connection string at Booking.Api/appsettings.json file
 
 ### Running The Api
 
@@ -70,3 +70,4 @@ dotnet run Booking.Api
 ```bash
 dotnet run Booking.Mvc
 ```
+- you can change the api base url at Booking.Mvc/appsettings.json
