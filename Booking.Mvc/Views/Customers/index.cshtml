@@ -1,0 +1,82 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Booking.Mvc.Models.Booking.CustomerModel>
+@{
+    ViewData["Title"] = "All Customers";
+}
+
+<div class="container mt-4">
+    <h2>All Customers</h2>
+
+    <!-- Add Customer Form -->
+    <div class="card mb-3">
+        <div class="card-header">Add Customer</div>
+        <div class="card-body">
+            <form id="addCustomerForm">
+                <div class="form-group">
+                    <label for="nId">National ID</label>
+                    <input type="text" id="nId" name="nId" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="name">Customer Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>National ID</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                @foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>@customer.NId</td>
+                        <td>@customer.Name</td>
+                        <td>@customer.PhoneNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#addCustomerForm").on("submit", function (e) {
+            e.preventDefault();
+            
+            var customer = {
+                nId: $("#nId").val(),
+                name: $("#name").val(),
+                phone: $("#phone").val()
+            };
+
+            $.ajax({
+                url: 'http://localhost:5104/api/Customer',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(customer),
+                success: function () {
+                    location.reload();
+                
+                },
+                error: function () {
+                    alert("Failed to add customer.");
+                }
+            });
+        });
+    });
+</script>

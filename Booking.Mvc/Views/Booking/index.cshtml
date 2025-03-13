@@ -1,0 +1,43 @@
+﻿@model PageModel<Booking.Mvc.Models.Booking.BookForListModel>
+
+<h2>Booking List</h2>
+
+<a class="btn btn-primary"  asp-action="Add">Add</a>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Customer Name</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var booking in Model.Data)
+    {
+        <tr>
+            <td>
+                <a href="@Url.Action("Details", "Booking", new { id = booking.Id })">
+                    @booking.Id
+                </a>
+            </td>
+            <td>@booking.CustomerName</td>
+            <td>@booking.Price</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div>
+    <p>Total Count: @Model.TotalCount</p>
+    <p>
+        @if (Model.HasLess)
+        {
+            <a href="@Url.Action("Index", new { page = Model.PrevPage, pageSize = Model.CurrentPageSize })">Previous</a>
+        }
+        @if (Model.HasMore)
+        {
+            <a href="@Url.Action("Index", new { page = Model.NextPage, pageSize = Model.CurrentPageSize })">Next</a>
+        }
+    </p>
+</div>

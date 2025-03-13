@@ -1,0 +1,85 @@
+﻿@model Booking.Mvc.Models.Booking.BookingDetailModel
+
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="container mt-4">
+    <h2>Booking Details - #@Model.Id</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Hotel Information
+        </div>
+        <div class="card-body">
+            <p>
+                <strong>Hotel:</strong> @Model.Hotel.BranchName (ID: @Model.Hotel.Id)
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Customer Information
+        </div>
+        <div class="card-body">
+            <p>
+                <strong>Name:</strong> @Model.Customer.Name <br/>
+                <strong>National ID:</strong> @Model.Customer.NId <br/>
+                <strong>Phone Number:</strong> @Model.Customer.PhoneNumber
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Booking Information
+        </div>
+        <div class="card-body">
+            <p>
+                <strong>Booking Date:</strong> @Model.BookDate.ToString("g")<br/>
+                <strong>Check-In Date:</strong> @Model.CheckInDate.ToString("g")<br/>
+                <strong>Check-Out Date:</strong> @Model.CheckOutDate.ToString("g")
+            </p>
+            <p>
+                <strong>Price Before Discount:</strong> @Model.PriceBeforeDiscount<br/>
+                <strong>Discount:</strong> @(Model.Discount * 100)%<br/>
+                <strong>Price After Discount:</strong> @Model.PriceAfterDiscount
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                Room Details
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Room ID</th>
+                        <th>Room Type</th>
+                        <th>Adults</th>
+                        <th>Children</th>
+                        <th>Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.Room.Id</td>
+                            <td>@item.Room.RoomType</td>
+                            <td>@item.NumberOfAdults</td>
+                            <td>@item.NumberOfChildren</td>
+                            <td>@item.Price</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

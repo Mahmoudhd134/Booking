@@ -1,0 +1,135 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Booking.Mvc.Models.Booking.HotelModel>
+@{
+    ViewData["Title"] = "All Hotels";
+}
+
+<div class="container mt-4">
+    <h2>All Hotels</h2>
+
+    <!-- Add Hotel Form -->
+    <div class="card mb-3">
+        <div class="card-header">Add Hotel</div>
+        <div class="card-body">
+            <form id="addHotelForm">
+                <div class="form-group">
+                    <label for="branchName">Branch Name</label>
+                    <input type="text" id="branchName" name="branchName" class="form-control" required />
+                </div>
+                <h5>Room Details</h5>
+                <!-- Container for dynamic room entries -->
+                <div id="roomEntriesContainer" class="row justify-content-between">
+                    <div class="room-entry border p-3 mb-2 col-5">
+                        <div class="form-row row">
+                            <div class="form-group col-3">
+                                <label>Room Type</label>
+                                <select class="form-control room-type" required>
+                                    <option value="1">Single</option>
+                                    <option value="2">Double</option>
+                                    <option value="3">Suit</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <label>Adults</label>
+                                <input type="number" class="form-control adults" min="0" required />
+                            </div>
+                            <div class="form-group col-3">
+                                <label>Children</label>
+                                <input type="number" class="form-control children" min="0" required />
+                            </div>
+                            <div class="form-group col-3">
+                                <label>Price Per Night</label>
+                                <input type="number" class="form-control price-per-night" min="0" step="0.01" required />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm remove-room-entry">Remove</button>
+                    </div>
+                </div>
+                <button type="button" id="addRoomButton" class="btn btn-secondary mb-3">Add Room</button>
+                <br />
+                <button type="submit" class="btn btn-primary">Add Hotel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hotels Table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Hotel ID</th>
+                    <th>Branch Name</th>
+                </tr>
+            </thead>
+            <tbody id="hotelTableBody">
+                @foreach (var hotel in Model)
+                {
+                    <tr>
+                        <td>@hotel.Id</td>
+                        <td>@hotel.BranchName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // When Add Room button is clicked, clone the first room entry
+        $("#addRoomButton").on("click", function () {
+            var newRoomEntry = $(".room-entry").first().clone();
+            // Clear inputs in the cloned entry
+            newRoomEntry.find("input").val("");
+            $("#roomEntriesContainer").append(newRoomEntry);
+        });
+
+        // Remove a room entry when its Remove button is clicked
+        $(document).on("click", ".remove-room-entry", function () {
+            // Allow removal only if more than one room entry exists
+            if ($(".room-entry").length > 1) {
+                $(this).closest(".room-entry").remove();
+            } else {
+                alert("At least one room entry is required.");
+            }
+        });
+
+        // Handle the add hotel form submission
+        $("#addHotelForm").on("submit", function (e) {
+            e.preventDefault();
+
+            var hotelData = {
+                brachName: $("#branchName").val(), // match the API property name
+                addRoomDtos: []
+            };
+
+            // Gather room entries
+            $("#roomEntriesContainer .room-entry").each(function () {
+                var roomType = parseInt($(this).find(".room-type").val());
+                var adults = parseInt($(this).find(".adults").val());
+                var children = parseInt($(this).find(".children").val());
+                var pricePerNight = parseFloat($(this).find(".price-per-night").val());
+                hotelData.addRoomDtos.push({
+                    roomType: roomType,
+                    adults: adults,
+                    children: children,
+                    pricePerNight: pricePerNight
+                });
+            });
+
+            $.ajax({
+                url: 'http://localhost:5104/api/Hotel', 
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(hotelData),
+                success: function () {
+                    // Reload the page to refresh the hotels list
+                    location.reload();
+                },
+                error: function () {
+                    alert("Failed to add hotel.");
+                }
+            });
+        });
+    });
+</script>
