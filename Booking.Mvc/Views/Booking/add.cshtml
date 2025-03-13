@@ -5,92 +5,71 @@
     ViewData["Title"] = "Add Booking";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- Popper and Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <style>
-        /* Additional custom styling if needed */
-        .custom-responsive {
-            overflow-x: auto;
-        }
-    </style>
-</head>
-<body>
-<div class="container mt-4">
-    <h2>Add Booking</h2>
-    <form id="bookingForm">
-        <!-- Customer Dropdown -->
-        <div class="form-group">
-            <label for="customerSelect">Select Customer</label>
-            <select id="customerSelect" class="form-control" required>
-                <option value="">-- Select a customer --</option>
-                @foreach (var customer in Model.Customers)
-                {
-                    <option value="@customer.NId" data-phone="@customer.PhoneNumber">
-                        @customer.Name
-                    </option>
-                }
-            </select>
-        </div>
+<h2>Add Booking</h2>
+<form id="bookingForm">
+    <!-- Customer Dropdown -->
+    <div class="form-group">
+        <label for="customerSelect">Select Customer</label>
+        <select id="customerSelect" class="form-control" required>
+            <option value="">-- Select a customer --</option>
+            @foreach (var customer in Model.Customers)
+            {
+                <option value="@customer.NId" data-phone="@customer.PhoneNumber">
+                    @customer.Name
+                </option>
+            }
+        </select>
+    </div>
 
-        <!-- Hotel Dropdown -->
-        <div class="form-group">
-            <label for="hotelSelect">Select Hotel</label>
-            <select id="hotelSelect" class="form-control" required>
-                <option value="">-- Select a hotel --</option>
-                @foreach (var hotel in Model.Hotels)
-                {
-                    <option value="@hotel.Id">@hotel.BranchName</option>
-                }
-            </select>
-        </div>
+    <!-- Hotel Dropdown -->
+    <div class="form-group">
+        <label for="hotelSelect">Select Hotel</label>
+        <select id="hotelSelect" class="form-control" required>
+            <option value="">-- Select a hotel --</option>
+            @foreach (var hotel in Model.Hotels)
+            {
+                <option value="@hotel.Id">@hotel.BranchName</option>
+            }
+        </select>
+    </div>
 
-        <!-- Check In / Check Out Dates -->
-        <div class="form-group">
-            <label for="checkInInput">Check In</label>
-            <input type="datetime-local" id="checkInInput" class="form-control" required/>
-        </div>
-        <div class="form-group">
-            <label for="checkOutInput">Check Out</label>
-            <input type="datetime-local" id="checkOutInput" class="form-control" required/>
-        </div>
+    <!-- Check In / Check Out Dates -->
+    <div class="form-group">
+        <label for="checkInInput">Check In</label>
+        <input type="datetime-local" id="checkInInput" class="form-control" required/>
+    </div>
+    <div class="form-group">
+        <label for="checkOutInput">Check Out</label>
+        <input type="datetime-local" id="checkOutInput" class="form-control" required/>
+    </div>
 
-        <!-- Room Quantity Inputs -->
-        <div class="form-group">
-            <label>Number of Rooms Required</label>
-            <div class="row">
-                <div class="col">
-                    <label for="singleRooms">Single</label>
-                    <input type="number" id="singleRooms" class="form-control" min="0" value="0"/>
-                </div>
-                <div class="col">
-                    <label for="doubleRooms">Double</label>
-                    <input type="number" id="doubleRooms" class="form-control" min="0" value="0"/>
-                </div>
-                <div class="col">
-                    <label for="suitRooms">Suit</label>
-                    <input type="number" id="suitRooms" class="form-control" min="0" value="0"/>
-                </div>
+    <!-- Room Quantity Inputs -->
+    <div class="form-group">
+        <label>Number of Rooms Required</label>
+        <div class="row">
+            <div class="col">
+                <label for="singleRooms">Single</label>
+                <input type="number" id="singleRooms" class="form-control" min="0" value="0"/>
+            </div>
+            <div class="col">
+                <label for="doubleRooms">Double</label>
+                <input type="number" id="doubleRooms" class="form-control" min="0" value="0"/>
+            </div>
+            <div class="col">
+                <label for="suitRooms">Suit</label>
+                <input type="number" id="suitRooms" class="form-control" min="0" value="0"/>
             </div>
         </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Check Availability</button>
-    </form>
+    <button type="submit" class="btn btn-primary">Check Availability</button>
+</form>
 
-    <!-- Error message container -->
-    <div id="errorMessage" class="mt-3"></div>
+<!-- Error message container -->
+<div id="errorMessage" class="mt-3"></div>
 
-    <!-- Container to display the available rooms as per request -->
-    <div id="roomsContainer" class="mt-4"></div>
-</div>
+<!-- Container to display the available rooms as per request -->
+<div id="roomsContainer" class="mt-4"></div>
 
 <!-- Booking Modal (readonly) -->
 <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
@@ -131,12 +110,10 @@
 </div>
 
 <script>
-    // Global variable to store available rooms for the current query.
-    var allAvailableRooms = null;
-    var currentQuery = { hotelId: null, checkIn: null, checkOut: null };
-    var finalBookingRequest = null;
+    let allAvailableRooms = null;
+    let currentQuery = { hotelId: null, checkIn: null, checkOut: null };
+    let finalBookingRequest = null;
 
-    // Map room type numeric value to string.
     function roomTypeToString(roomType) {
         switch (roomType) {
             case 1: return "Single";
@@ -150,35 +127,33 @@
         $('#bookingModal').modal('hide');
     });
 
-    // Generates a dropdown element with options 0 to maxValue.
     function generateDropdown(maxValue, cssClass) {
-        var selectHtml = "<select class='" + cssClass + " form-control'>";
-        for (var i = 0; i <= maxValue; i++) {
+        let selectHtml = "<select class='" + cssClass + " form-control'>";
+        for (let i = 0; i <= maxValue; i++) {
             selectHtml += "<option value='" + i + "'>" + i + "</option>";
         }
         selectHtml += "</select>";
         return selectHtml;
     }
 
-    // Filter and display rooms based on requested room counts.
     function filterAndDisplayRooms() {
-        var requestedSingle = parseInt($("#singleRooms").val());
-        var requestedDouble = parseInt($("#doubleRooms").val());
-        var requestedSuit = parseInt($("#suitRooms").val());
+        const requestedSingle = parseInt($("#singleRooms").val());
+        const requestedDouble = parseInt($("#doubleRooms").val());
+        const requestedSuit = parseInt($("#suitRooms").val());
         
         if (requestedSingle === 0 && requestedDouble === 0 && requestedSuit ===0){
             $("#roomsContainer").empty();
             return
         }
 
-        var availableRooms = { 1: [], 2: [], 3: [] };
+        let availableRooms = { 1: [], 2: [], 3: [] };
         $.each(allAvailableRooms, function (i, room) {
             if (room.roomType in availableRooms) {
                 availableRooms[room.roomType].push(room);
             }
         });
 
-        var errorMessages = [];
+        const errorMessages = [];
         if (requestedSingle > availableRooms[1].length) {
             errorMessages.push("Not enough Single rooms available. Requested: " + requestedSingle + ", Available: " + availableRooms[1].length);
         }
@@ -196,9 +171,7 @@
         }
         $("#errorMessage").empty();
 
-        // Build HTML to display room details with dropdowns for selecting adults/children.
-        var html = '<h3>Selected Available Rooms</h3>';
-        // Wrap the table with a responsive div.
+        let html = '<h3>Selected Available Rooms</h3>';
         html += '<div class="table-responsive">';
         html += '<table class="table table-bordered">';
         html += '<thead><tr>' +
@@ -214,7 +187,7 @@
 
         function addRows(roomType, requestedCount) {
             if (requestedCount > 0) {
-                var displayRooms = availableRooms[roomType].slice(0, requestedCount);
+                let displayRooms = availableRooms[roomType].slice(0, requestedCount);
                 $.each(displayRooms, function (i, room) {
                     html += '<tr data-roomid="' + room.id + '">';
                     html += '<td>' + room.id + '</td>';
@@ -238,11 +211,10 @@
         $("#roomsContainer").html(html);
     }
 
-    // Load available rooms from the API if not already loaded.
     function loadAvailableRooms(callback) {
-        var hotelId = $("#hotelSelect").val();
-        var checkIn = $("#checkInInput").val();
-        var checkOut = $("#checkOutInput").val();
+        const hotelId = $("#hotelSelect").val();
+        const checkIn = $("#checkInInput").val();
+        const checkOut = $("#checkOutInput").val();
 
         if (!hotelId || !checkIn || !checkOut) {
             $("#errorMessage").html('<p class="text-danger">Please select a hotel and specify both check-in and check-out dates.</p>');
@@ -259,7 +231,7 @@
             return;
         }
 
-        var url = 'http://localhost:5104/api/Hotel/' + hotelId + '/available-rooms';
+        const url = 'Hotel/' + hotelId + '/available-rooms';
         $.ajax({
             url: url,
             type: 'GET',
@@ -274,9 +246,8 @@
         });
     }
 
-    // Build a readonly summary table for the modal.
     function buildModalSummary() {
-        var summaryHtml = "<div class='table-responsive'><table class='table table-bordered'>";
+        let summaryHtml = "<div class='table-responsive'><table class='table table-bordered'>";
         summaryHtml += "<thead><tr>" +
             "<th>Room ID</th>" +
             "<th>Room Type</th>" +
@@ -287,13 +258,13 @@
             "<th>Selected Children</th>" +
             "</tr></thead><tbody>";
         $("#roomsContainer table tbody tr").each(function () {
-            var roomId = $(this).find("td:eq(0)").text();
-            var roomType = $(this).find("td:eq(1)").text();
-            var adultsAllowed = $(this).find("td:eq(2)").text();
-            var childrenAllowed = $(this).find("td:eq(3)").text();
-            var pricePerNight = $(this).find("td:eq(4)").text();
-            var selectedAdults = $(this).find("td:eq(5) select").val();
-            var selectedChildren = $(this).find("td:eq(6) select").val();
+            const roomId = $(this).find("td:eq(0)").text();
+            const roomType = $(this).find("td:eq(1)").text();
+            const adultsAllowed = $(this).find("td:eq(2)").text();
+            const childrenAllowed = $(this).find("td:eq(3)").text();
+            const pricePerNight = $(this).find("td:eq(4)").text();
+            const selectedAdults = $(this).find("td:eq(5) select").val();
+            const selectedChildren = $(this).find("td:eq(6) select").val();
 
             summaryHtml += "<tr>";
             summaryHtml += "<td>" + roomId + "</td>";
@@ -309,17 +280,16 @@
         return summaryHtml;
     }
 
-    // Send POST request to calculate the booking price.
     function sendPriceRequest(modalData) {
         $("#confirmBooking").prop("disabled", true);
         $("#modalPriceSummary").html("<p>Calculating price...</p>");
         $.ajax({
-            url: 'http://localhost:5104/api/Booking/price',
+            url: 'Booking/price',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(modalData),
             success: function (priceData) {
-                var priceHtml = "<p><strong>Discount:</strong> " + priceData.discount + "</p>" +
+                const priceHtml = "<p><strong>Discount:</strong> " + priceData.discount + "</p>" +
                     "<p><strong>Price Before Discount:</strong> " + priceData.priceBeforeDiscount + "</p>" +
                     "<p><strong>Price After Discount:</strong> " + priceData.priceAfterDiscount + "</p>";
                 $("#modalPriceSummary").html(priceHtml);
@@ -331,26 +301,23 @@
         });
     }
 
-    // When the Book button is clicked, open the modal and build the summary.
     $(document).on("click", "#bookButton", function () {
-        var customerSelect = $("#customerSelect option:selected");
-        var customerNId = customerSelect.val();
-        var customerName = customerSelect.text();
-        var customerPhone = customerSelect.data("phone");
+        const customerSelect = $("#customerSelect option:selected");
+        const customerNId = customerSelect.val();
+        const customerName = customerSelect.text();
+        const customerPhone = customerSelect.data("phone");
         $("#modalCustomer").text(customerName + " (" + customerPhone + ")");
 
-        var hotelText = $("#hotelSelect option:selected").text();
-        var checkIn = $("#checkInInput").val();
-        var checkOut = $("#checkOutInput").val();
+        const hotelText = $("#hotelSelect option:selected").text();
+        const checkIn = $("#checkInInput").val();
+        const checkOut = $("#checkOutInput").val();
         $("#modalHotel").text(hotelText);
         $("#modalCheckIn").text(checkIn);
         $("#modalCheckOut").text(checkOut);
 
-        // Build a read-only summary table.
-        var summaryTableHtml = buildModalSummary();
+        const summaryTableHtml = buildModalSummary();
         $("#modalRoomsSummary").html(summaryTableHtml);
 
-        // Build the request body for price calculation and final booking.
         finalBookingRequest = {
             customerNId: customerNId,
             hotelId: parseInt($("#hotelSelect").val()),
@@ -360,9 +327,9 @@
         };
 
         $("#roomsContainer table tbody tr").each(function () {
-            var roomId = parseInt($(this).find("td:first").text());
-            var selectedAdults = parseInt($(this).find("td:eq(5) select").val());
-            var selectedChildren = parseInt($(this).find("td:eq(6) select").val());
+            const roomId = parseInt($(this).find("td:first").text());
+            const selectedAdults = parseInt($(this).find("td:eq(5) select").val());
+            const selectedChildren = parseInt($(this).find("td:eq(6) select").val());
             finalBookingRequest.items.push({
                 roomId: roomId,
                 adults: selectedAdults,
@@ -374,12 +341,11 @@
         sendPriceRequest(finalBookingRequest);
     });
 
-    // When the Confirm Booking button is clicked, send the final booking request.
     $("#confirmBooking").on("click", function () {
         $("#confirmBooking").prop("disabled", true);
         $("#modalPriceSummary").append("<p>Confirming booking...</p>");
         $.ajax({
-            url: 'http://localhost:5104/api/Booking',
+            url: 'Booking',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(finalBookingRequest),
@@ -414,5 +380,3 @@
         });
     });
 </script>
-</body>
-</html>

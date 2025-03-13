@@ -76,17 +76,13 @@
 
 <script>
     $(document).ready(function () {
-        // When Add Room button is clicked, clone the first room entry
         $("#addRoomButton").on("click", function () {
             var newRoomEntry = $(".room-entry").first().clone();
-            // Clear inputs in the cloned entry
             newRoomEntry.find("input").val("");
             $("#roomEntriesContainer").append(newRoomEntry);
         });
 
-        // Remove a room entry when its Remove button is clicked
         $(document).on("click", ".remove-room-entry", function () {
-            // Allow removal only if more than one room entry exists
             if ($(".room-entry").length > 1) {
                 $(this).closest(".room-entry").remove();
             } else {
@@ -94,16 +90,14 @@
             }
         });
 
-        // Handle the add hotel form submission
         $("#addHotelForm").on("submit", function (e) {
             e.preventDefault();
 
             var hotelData = {
-                brachName: $("#branchName").val(), // match the API property name
+                brachName: $("#branchName").val(), 
                 addRoomDtos: []
             };
 
-            // Gather room entries
             $("#roomEntriesContainer .room-entry").each(function () {
                 var roomType = parseInt($(this).find(".room-type").val());
                 var adults = parseInt($(this).find(".adults").val());
@@ -118,12 +112,11 @@
             });
 
             $.ajax({
-                url: 'http://localhost:5104/api/Hotel', 
+                url: 'Hotel', 
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(hotelData),
                 success: function () {
-                    // Reload the page to refresh the hotels list
                     location.reload();
                 },
                 error: function () {
